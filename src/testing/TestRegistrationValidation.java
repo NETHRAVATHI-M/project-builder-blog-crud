@@ -1,6 +1,7 @@
 package testing;
 
-/*Uncomment the below code test your application
+/*Uncomment the below code to test your application
+
 import static org.junit.Assert.*;
 import org.junit.Test;
 import businesslogic.RegistrationValidation;
