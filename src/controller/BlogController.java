@@ -2,6 +2,7 @@ package controller;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -11,8 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import model.Blog;
-
-
+import model.User;
+import service.CRUDOperations;
+import utility.CheckBlogPost;
 
 
 @WebServlet(urlPatterns= {"/blog"})
@@ -23,7 +25,6 @@ public class BlogController extends HttpServlet {
     public BlogController() {
         super();
         // TODO Auto-generated constructor stub
-    	
     }
 
 
@@ -36,15 +37,44 @@ public class BlogController extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String blogDetails = request.getParameter("selectedAnswers");
+		System.out.println(blogDetails);
 		
-		if(blogDetails!=null) {
-			Blog  b=new Blog("A blog on Java","This sample blog explains about Java basics", null);
-			request.setAttribute("blog", b.getTitle());
-			request.setAttribute("user",b.getDescription());
+		String[] userBlog=blogDetails.split(",");
+		String title = userBlog[0];
+		String description = userBlog[0];
+		LocalDate postedOn = LocalDate.now();
+		System.out.println(title);
+		System.out.println(description);
+		
+		User user = null;
+		Blog blog=new Blog(title,description,postedOn);
+		System.out.println(title);
+		System.out.println(description);
+		
+		blog.setBlogTitle(title);
+		blog.setBlogDescription(description);
+		blog.setDate(postedOn);
+		
+		CheckBlogPost checkBlog=new CheckBlogPost();
+		boolean check=checkBlog.checkBlog(blog);
+		
+		CRUDOperations crud=new CRUDOperations();
+		List<Blog> listblog = crud.createBlog(blog);
+
+		if(check) {
+			request.setAttribute("listBlog", listblog);
+		//	request.setAttribute("blog", blog);
+		//	request.setAttribute("user",user);
 			RequestDispatcher rd=this.getServletContext().getRequestDispatcher("/WEB-INF/views/blogView.jsp");
 			rd.forward(request, response);
 		}
-	
+		else
+		{
+			request.setAttribute("message","Your blog contains offensive words. Please use appropriate words.");
+			RequestDispatcher rd=this.getServletContext().getRequestDispatcher("/WEB-INF/views/blogView.jsp");
+			rd.forward(request, response);
+		}
+		
 	}
 
 }
